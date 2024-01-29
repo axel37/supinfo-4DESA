@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PostRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -30,10 +32,14 @@ class Post
     #[ORM\Column]
     private \DateTimeImmutable $postedAt;
 
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Attachment::class, orphanRemoval: true)]
+    private Collection $attachments;
+
     public function __construct()
     {
         $this->id = Uuid::v4();
         $this->postedAt = new \DateTimeImmutable();
+        $this->attachments = new ArrayCollection();
     }
 
     public function getId(): Uuid
@@ -56,6 +62,36 @@ class Post
     public function getPostedAt(): \DateTimeImmutable
     {
         return $this->postedAt;
+    }
+
+    /**
+     * @return Collection<int, Attachment>
+     */
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+    public function addAttachment(Attachment $attachment): static
+    {
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments->add($attachment);
+            $attachment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttachment(Attachment $attachment): static
+    {
+        if ($this->attachments->removeElement($attachment)) {
+            // set the owning side to null (unless already changed)
+            if ($attachment->getPost() === $this) {
+                $attachment->setPost(null);
+            }
+        }
+
+        return $this;
     }
 
 }
