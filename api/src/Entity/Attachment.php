@@ -7,6 +7,9 @@ use App\Repository\AttachmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * A file attached to a Post.
+ */
 #[ORM\Entity(repositoryClass: AttachmentRepository::class)]
 #[ApiResource]
 class Attachment
