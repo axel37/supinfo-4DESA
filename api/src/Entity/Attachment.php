@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AttachmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * A file attached to a Post.
@@ -19,6 +20,7 @@ class Attachment
     private Uuid $id;
 
     #[ORM\Column(length: 500)]
+    #[NotBlank]
     private ?string $systemName = null;
 
     #[ORM\Column(length: 500, nullable: true)]
@@ -26,11 +28,13 @@ class Attachment
 
     #[ORM\ManyToOne(inversedBy: 'attachments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Post $post = null;
+    #[NotBlank]
+    private Post $post;
 
-    public function __construct()
+    public function __construct(Post $post)
     {
         $this->id = Uuid::v4();
+        $this->post = $post;
     }
 
     public function getId(): Uuid
@@ -62,15 +66,8 @@ class Attachment
         return $this;
     }
 
-    public function getPost(): ?Post
+    public function getPost(): Post
     {
         return $this->post;
-    }
-
-    public function setPost(?Post $post): static
-    {
-        $this->post = $post;
-
-        return $this;
     }
 }
