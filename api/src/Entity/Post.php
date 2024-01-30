@@ -7,7 +7,9 @@ use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * A user-generated post. Can contain text and/or files.
@@ -24,6 +26,7 @@ class Post
      * @var string|null The text written by the user.
      */
     #[ORM\Column(length: 1000, nullable: true)]
+    #[NotBlank]
     private ?string $textContent = null;
 
     /**
@@ -33,6 +36,7 @@ class Post
     private \DateTimeImmutable $postedAt;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Attachment::class, orphanRemoval: true)]
+//    #[Groups('post:write')]
     private Collection $attachments;
 
     public function __construct()
