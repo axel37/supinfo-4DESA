@@ -70,4 +70,11 @@ class Attachment
     {
         return $this->post;
     }
+
+    public function setPost(?Post $post): static
+    {
+        $this->post = $post;
+
+        return $this;
+    }
 }

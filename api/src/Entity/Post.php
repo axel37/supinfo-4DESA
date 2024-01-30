@@ -7,7 +7,6 @@ use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -36,7 +35,6 @@ class Post
     private \DateTimeImmutable $postedAt;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Attachment::class, orphanRemoval: true)]
-//    #[Groups('post:write')]
     private Collection $attachments;
 
     public function __construct()
