@@ -26,11 +26,11 @@ use App\Entity\Post as PostEntity;
 
 #[ApiResource(
     operations: [
-        new GetCollection(),
+        new GetCollection(security: "is_granted('IS_AUTHENTICATED_FULLY')"),
         new Post(validationContext: ['groups' => ['Default', 'user:create']], processor: UserPasswordHasher::class),
-        new Get(),
-        new Put(processor: UserPasswordHasher::class),
-        new Patch(processor: UserPasswordHasher::class),
+        new Get(security: "is_granted('IS_AUTHENTICATED_FULLY')"),
+        new Put(processor: UserPasswordHasher::class, security: "is_granted('IS_AUTHENTICATED_FULLY')"),
+        new Patch(processor: UserPasswordHasher::class, security: "is_granted('IS_AUTHENTICATED_FULLY')"),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['user:read']],
