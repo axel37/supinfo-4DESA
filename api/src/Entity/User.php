@@ -66,6 +66,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: PostEntity::class, orphanRemoval: true)]
     private Collection $posts;
 
+    #[ORM\Column]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
+    private bool $profileIsPublic = false;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -178,6 +182,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $post->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isProfileIsPublic(): bool
+    {
+        return $this->profileIsPublic;
+    }
+
+    public function setProfileIsPublic(bool $profileIsPublic): static
+    {
+        $this->profileIsPublic = $profileIsPublic;
 
         return $this;
     }
