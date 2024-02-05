@@ -37,6 +37,10 @@ class Post
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Attachment::class, orphanRemoval: true)]
     private Collection $attachments;
 
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $author = null;
+
     public function __construct()
     {
         $this->id = Uuid::v4();
@@ -92,6 +96,18 @@ class Post
                 $attachment->setPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
