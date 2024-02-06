@@ -55,6 +55,9 @@ ENTRYPOINT ["docker-entrypoint"]
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 
+# Copie du fichier z-custom.ini
+COPY --link z-custom.ini $PHP_INI_DIR/conf.d/
+
 # Dev FrankenPHP image
 FROM frankenphp_base AS frankenphp_dev
 
@@ -71,6 +74,9 @@ RUN set -eux; \
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
+
+# Copie du fichier z-custom.ini
+COPY --link z-custom.ini $PHP_INI_DIR/conf.d/
 
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
@@ -98,3 +104,6 @@ RUN set -eux; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;
+
+# Copie du fichier z-custom.ini
+COPY --link z-custom.ini $PHP_INI_DIR/conf.d/
