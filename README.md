@@ -16,3 +16,15 @@ docker compose exec php sh -c '
     setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
 '
 ```
+
+## Accès à la documentation
+Une fois fais, allez à l'adresse :
+```
+https://symmetrical-disco-gw6v5ppp7pvf7xp-443.app.github.dev/
+```
+
+Aller ensuite dans la section 'API' pour acceder à la documentation 'SWAGGER'.
+
+## Utiliser l'API
+L'API peux être utilisé directement avec la documentation SWAGGER dans la section 'Try it out'.
+Vous pouver également utiliser un logiciel de requête comme Postman par exemple.
