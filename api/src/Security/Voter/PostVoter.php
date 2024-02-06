@@ -7,11 +7,16 @@ use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Psr\Log\LoggerInterface;
 
 class PostVoter extends Voter
 {
     public const EDIT = 'POST_EDIT';
     public const VIEW = 'POST_VIEW';
+
+    public function __construct(private LoggerInterface $logger)
+    {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -23,7 +28,6 @@ class PostVoter extends Voter
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
-
         return match ($attribute) {
             self::VIEW => self::canView($subject, $user),
             self::EDIT => self::canEdit($subject, $user)
