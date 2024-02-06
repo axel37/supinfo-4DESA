@@ -15,9 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Entity\Post as PostEntity;
 
+/**
+ * A file attached to a Post.
+ */
 #[ORM\Entity(repositoryClass: AttachmentRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['media_object:read']],
@@ -61,7 +65,7 @@ use App\Entity\Post as PostEntity;
 class Attachment
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: 'uuid')]
     private Uuid $id;
 
     #[Vich\UploadableField(mapping: "attachment", fileNameProperty: "systemName")]
@@ -78,6 +82,7 @@ class Attachment
 
     #[ORM\ManyToOne(inversedBy: 'attachments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[NotBlank]
     private ?PostEntity $post = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]

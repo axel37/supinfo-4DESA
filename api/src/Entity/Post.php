@@ -3,17 +3,37 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use App\Repository\PostRepository;
+use App\State\AssociateUserToPostProcessor;
+use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * A user-generated post. Can contain text and/or files.
  */
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new \ApiPlatform\Metadata\Post(processor: AssociateUserToPostProcessor::class),
+        new Get(security: "isGranted('POST_VIEW')"),
+        new Put(security: "isGranted('POST_WRITE')"),
+        new Patch(security: "isGranted('POST_WRITE')"),
+        new Delete(security: "isGranted('POST_WRITE')"),
+    ],
+    normalizationContext: ['groups' => ['post:read']],
+    denormalizationContext: ['groups' => ['post:write']],
+)]
 class Post
 {
     #[ORM\Id]
@@ -24,16 +44,26 @@ class Post
      * @var string|null The text written by the user.
      */
     #[ORM\Column(length: 1000, nullable: true)]
+    #[NotBlank]
+    #[Groups(['post:read', 'post:write'])]
     private ?string $textContent = null;
 
     /**
      * @var \DateTimeImmutable The original time of publication.
      */
     #[ORM\Column]
+    #[Groups(['post:read'])]
     private \DateTimeImmutable $postedAt;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Attachment::class, orphanRemoval: true)]
+    #[Groups(['post:read'])]
     private Collection $attachments;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['post:read'])]
+    // TODO : Ne pas demander author lors de la création (ça doit être automatique)
+    private ?User $author = null;
 
     public function __construct()
     {
@@ -90,6 +120,18 @@ class Post
                 $attachment->setPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
